@@ -1,0 +1,98 @@
+ <html>
+
+ <head>
+   <title>IP to location Golang example</title>
+   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+   <meta charset="utf-8">
+   <style>
+     html, body, #map-canvas {
+          height:700px;
+          margin: 0px;
+          padding: 0px
+        }
+   </style>
+   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBuByZcc7ntraXTDqPLyYk-xbc8U3paPdY&callback=initMap"></script>
+   <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+ </head>
+
+ <body>
+
+   <h1>IP to Location Golang example</h1>
+   <div>
+     <input type="text" placeholder="0.0.0.0" id="ajax_btn" value="">
+     <span>
+                 <button id="ajax_btn_search" type="button">Search</button>
+         </span>
+   </div>
+
+
+   <script>
+     $(document).ready(function () { 
+                          $('#ajax_btn_search').click(function () {
+
+                              ipAddress = $('#ajax_btn').val()
+
+
+                              $.ajax({
+                                url: 'returncoord',
+                                type: 'post',
+                                dataType: 'html',
+                                data : { ajax_post_data: ipAddress},
+                                success : function(data) {
+                                  $('#result').html(data);
+
+                                  //get the Lat and Long as JSON
+                                  var json = JSON.parse(data);
+                                  showMap(json["Lat"], json["Long"], ipAddress);
+
+                                },
+                              });
+                           });
+                     });
+
+
+         var map;
+
+         function showMap(latitude,longitude,ipaddress) { 
+
+                 var pos = new google.maps.LatLng(latitude,longitude);
+
+                 var mapOptions = { 
+                         zoom: 15,
+                         center: pos,
+                         mapTypeId: google.maps.MapTypeId.ROADMAP,
+                         content : 'Location found by IP Address' 
+                 };
+
+                 var mapDiv = document.getElementById("map-canvas");
+                 map = new google.maps.Map(mapDiv, mapOptions);
+
+                 var title = ipaddress + " location"; 
+                 addMarker(map, pos, title, "");
+
+         }
+
+         function addMarker(map, latlong, title, content) { 
+                //var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+                 var markerOptions = {
+                         position: latlong,
+                         map: map,
+                         title: title, 
+                         clickable: true
+                 //        icon: image
+                 };
+                 var marker = new google.maps.Marker(markerOptions); 
+         }
+   </script>
+
+
+   <div id='result'></div>
+   <br>
+   <br>
+
+   <div id="map-canvas"></div>
+ </body>
+
+ </html>
+
