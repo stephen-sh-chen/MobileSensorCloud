@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/oschwald/geoip2-golang"
-	//"github.com/pubnub/go/messaging"
+	"github.com/pubnub/go/messaging"
 	"html/template"
 	"io"
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -115,6 +116,9 @@ type AddSensorRes struct {
 // Global variables
 var sensorMap = make(map[string]SensorProfile)
 var trafficOn int = 0
+var my_pubkey = "pub-c-bcc7ac96-ccbe-4577-bd6f-66321585d73a"
+var my_subkey = "sub-c-6d08ffd2-a589-11e6-80e1-0619f8945a4f"
+var my_channel = "my_channel"
 
 // newUUID generates a random UUID according to RFC 4122
 func newUUID() (string, error) {
@@ -131,33 +135,69 @@ func newUUID() (string, error) {
 }
 
 func publishSensorInfo() {
-	// Block of PubNub message channel
-	/*	my_pubkey := "pub-c-bcc7ac96-ccbe-4577-bd6f-66321585d73a"
-		my_subkey := "sub-c-6d08ffd2-a589-11e6-80e1-0619f8945a4f"
+	pubnub := messaging.NewPubnub(my_pubkey, my_subkey, "", "", false, "")
+	fmt.Println("PubNub SDK for go;", messaging.VersionInfo())
+	successChannel := make(chan []byte)
+	errorChannel := make(chan []byte)
 
-		pubnub := messaging.NewPubnub(my_pubkey, my_subkey, "", "", false, "")
-		fmt.Println("PubNub SDK for go;", messaging.VersionInfo())
-		successChannel := make(chan []byte)
-		errorChannel := make(chan []byte)
-	*/
 	for {
 		if trafficOn > 0 {
 			for _, value := range sensorMap {
+				time.Sleep(1000 * time.Millisecond)
 				j, _ := json.Marshal(value)
 				fmt.Println(string(j))
+
+				go pubnub.Publish(my_channel, string(j), successChannel, errorChannel)
+
+				select {
+				case response := <-successChannel:
+					fmt.Println(string(response))
+				case err := <-errorChannel:
+					fmt.Println(string(err))
+				case <-messaging.Timeout():
+					fmt.Println("Publish() timeout")
+				}
 			}
 		}
 	}
-	/*go pubnub.Publish("my_channel", "Hello from the PubNub Go SDK!", successChannel, errorChannel)
+}
 
-	select {
-	case response := <-successChannel:
-		fmt.Println(string(response))
-	case err := <-errorChannel:
-		fmt.Println(string(err))
-	case <-messaging.Timeout():
-		fmt.Println("Publish() timeout")
-	}*/
+func subscribeSensorInfo() {
+	pubnub := messaging.NewPubnub(my_pubkey, my_subkey, "", "", false, "")
+	successChannel := make(chan []byte)
+	errorChannel := make(chan []byte)
+
+	go pubnub.Subscribe(my_channel, "", successChannel, false, errorChannel)
+
+	go func() {
+		for {
+			select {
+			case response := <-successChannel:
+				var msg []interface{}
+
+				err := json.Unmarshal(response, &msg)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				fmt.Println("got msg!") //Test
+				switch m := msg[0].(type) {
+				case float64:
+					fmt.Println(msg[1].(string))
+				case []interface{}:
+					fmt.Printf("Received message '%s' on channel '%s'\n", m[0], msg[2])
+					//return
+				default:
+					panic(fmt.Sprintf("Unknown type: %T", m))
+				}
+
+			case err := <-errorChannel:
+				fmt.Println(string(err))
+			case <-messaging.SubscribeTimeout():
+				fmt.Println("Subscribe() timeout")
+			}
+		}
+	}()
 }
 
 func trafficOnHandler(w http.ResponseWriter, r *http.Request) {
@@ -227,6 +267,7 @@ func main() {
 
 	// Enable to publish sensor info
 	trafficOn = 1
+	subscribeSensorInfo()
 	go publishSensorInfo()
 
 	// Start to port 3000 for REST service
