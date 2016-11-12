@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/rand"
+	crypto_rand "crypto/rand"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -9,6 +9,7 @@ import (
 	"github.com/pubnub/go/messaging"
 	"html/template"
 	"io"
+	"math/rand"
 	"net"
 	"net/http"
 	"strconv"
@@ -95,8 +96,18 @@ type SensorProfile struct {
 	Unit          string
 	HostVehicleID string
 	Group         int
-	Lon           float64
+	Lont          float64
 	Lat           float64
+}
+
+type SensorSignal struct {
+	SignalID  string
+	SensorID  string
+	TimeStamp string
+	Value     float64
+	Unit      string
+	Lont      float64
+	Lat       float64
 }
 
 type AddSensorReq struct {
@@ -123,7 +134,7 @@ var my_channel = "my_channel"
 // newUUID generates a random UUID according to RFC 4122
 func newUUID() (string, error) {
 	uuid := make([]byte, 16)
-	n, err := io.ReadFull(rand.Reader, uuid)
+	n, err := io.ReadFull(crypto_rand.Reader, uuid)
 	if n != len(uuid) || err != nil {
 		return "", err
 	}
@@ -134,6 +145,36 @@ func newUUID() (string, error) {
 	return fmt.Sprintf("%x-%x-%x-%x-%x", uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
 }
 
+func float_rand(start_num float64, end_num float64) float64 {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Float64()*(end_num-start_num) + start_num
+}
+
+func noiseGen() float64 {
+	return float_rand(40, 130) // the unit is dB: decibel
+}
+
+func airPollutionGen() float64 {
+	return float_rand(1, 10) // the unit is AQI: Air Quaility Index
+}
+
+func signalHelper(sensor *SensorProfile, signal *SensorSignal) {
+	signal.SignalID, _ = newUUID()
+	signal.SensorID = sensor.ID
+	signal.TimeStamp = strconv.FormatInt(time.Now().UnixNano(), 10)
+
+	// sensor type is noise
+	if sensor.Type == 1 {
+		signal.Value = noiseGen()
+		signal.Unit = "dB"
+	} else if sensor.Type == 2 {
+		signal.Value = airPollutionGen()
+		signal.Unit = "AQI"
+	}
+	signal.Lont = 30.4524
+	signal.Lat = -123.56
+}
+
 func publishSensorInfo() {
 	pubnub := messaging.NewPubnub(my_pubkey, my_subkey, "", "", false, "")
 	fmt.Println("PubNub SDK for go;", messaging.VersionInfo())
@@ -142,20 +183,24 @@ func publishSensorInfo() {
 
 	for {
 		if trafficOn > 0 {
-			for _, value := range sensorMap {
+			for _, sensor := range sensorMap {
 				time.Sleep(1000 * time.Millisecond)
-				j, _ := json.Marshal(value)
-				fmt.Println(string(j))
+				//j, _ := json.Marshal(value)
+				//fmt.Println(string(j))
+				if sensor.State == 1 {
+					var signal SensorSignal
+					signalHelper(&sensor, &signal)
 
-				go pubnub.Publish(my_channel, string(j), successChannel, errorChannel)
-
-				select {
-				case response := <-successChannel:
-					fmt.Println(string(response))
-				case err := <-errorChannel:
-					fmt.Println(string(err))
-				case <-messaging.Timeout():
-					fmt.Println("Publish() timeout")
+					j, _ := json.Marshal(signal)
+					go pubnub.Publish(my_channel, string(j), successChannel, errorChannel)
+					select {
+					case response := <-successChannel:
+						fmt.Println(string(response))
+					case err := <-errorChannel:
+						fmt.Println(string(err))
+					case <-messaging.Timeout():
+						fmt.Println("Publish() timeout")
+					}
 				}
 			}
 		}
