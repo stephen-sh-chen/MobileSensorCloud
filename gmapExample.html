@@ -95,16 +95,16 @@
 
     function pubs() {
       pubnub = PUBNUB.init({
-        publish_key: 'demo',
-        subscribe_key: 'demo'
+        publish_key: 'pub-c-bcc7ac96-ccbe-4577-bd6f-66321585d73a',
+        subscribe_key: 'sub-c-6d08ffd2-a589-11e6-80e1-0619f8945a4f'
       })
 
       pubnub.subscribe({
-        channel: "mymaps",
+        channel: "my_channel",
         message: function(message, channel) {
           console.log(message)
-          lat = message['lat'];
-          lng = message['lng'];
+          lat = message['Lat'];
+          lng = message['Long'];
           //custom method
           redraw();
         },

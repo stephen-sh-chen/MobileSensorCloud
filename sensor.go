@@ -96,7 +96,7 @@ type SensorProfile struct {
 	Unit          string
 	HostVehicleID string
 	Group         int
-	Lont          float64
+	Long          float64
 	Lat           float64
 }
 
@@ -106,7 +106,7 @@ type SensorSignal struct {
 	TimeStamp string
 	Value     float64
 	Unit      string
-	Lont      float64
+	Long      float64
 	Lat       float64
 }
 
@@ -171,8 +171,11 @@ func signalHelper(sensor *SensorProfile, signal *SensorSignal) {
 		signal.Value = airPollutionGen()
 		signal.Unit = "AQI"
 	}
-	signal.Lont = 30.4524
-	signal.Lat = -123.56
+
+	sensor.Long += float_rand(0.001, 0.005)
+	sensor.Lat += float_rand(0.001, 0.005)
+	signal.Long = sensor.Long
+	signal.Lat = sensor.Lat
 }
 
 func publishSensorInfo() {
@@ -284,6 +287,9 @@ func addSensorHandler(w http.ResponseWriter, r *http.Request) {
 		sNew.Unit = "db"
 		sNew.HostVehicleID = sReq.HostVehicleID
 		sNew.Group = 0
+		sNew.Long = -121.87558059999999
+		sNew.Lat = 37.3798867
+
 		//fmt.Println("Sesnot ID = " + sNew.ID)
 
 		sensorMap[sNew.ID] = sNew // add sensor in the management map
