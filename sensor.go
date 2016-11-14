@@ -300,10 +300,10 @@ func main() {
 
 	mux := mux.NewRouter()
 
-	mux.HandleFunc("/", home)
+	mux.HandleFunc("/", home) // sensorAdd.html
 	mux.HandleFunc("/returncoord", returnLatLong)
-	mux.HandleFunc("/test/", test)
-	mux.HandleFunc("/test/gmap/", testGmap)
+	mux.HandleFunc("/test", test)          // index.html
+	mux.HandleFunc("/test/gmap", testGmap) // gmapExample.html
 
 	// Block of my sensor API
 	mux.HandleFunc("/api/addSensor", addSensorHandler)
