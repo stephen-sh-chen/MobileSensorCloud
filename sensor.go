@@ -259,7 +259,7 @@ func trafficOffHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addSensorHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hello")
+	fmt.Println("Enter addSensorHandler!")
 
 	if r.Method == "POST" {
 		if r.Body == nil {
@@ -296,6 +296,21 @@ func addSensorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func showSensorListHandler(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("Enter showSensorListHandler!")
+
+	if r.Method == "GET" {
+		if r.Body == nil {
+			http.Error(w, "Please send a request body", 400)
+			return
+		}
+
+		json.NewEncoder(w).Encode(sensorMap)
+	}
+
+}
+
 func main() {
 
 	mux := mux.NewRouter()
@@ -306,9 +321,10 @@ func main() {
 	mux.HandleFunc("/test/gmap", testGmap) // gmapExample.html
 
 	// Block of my sensor API
-	mux.HandleFunc("/api/addSensor", addSensorHandler)    // POST method
-	mux.HandleFunc("/api/traffic/on", trafficOnHandler)   // all method
-	mux.HandleFunc("/api/traffic/off", trafficOffHandler) // all method
+	mux.HandleFunc("/api/addSensor", addSensorHandler)             // POST method
+	mux.HandleFunc("/api/show-sensor-list", showSensorListHandler) // Get  method
+	mux.HandleFunc("/api/traffic/on", trafficOnHandler)            // Get  method
+	mux.HandleFunc("/api/traffic/off", trafficOffHandler)          // Get  method
 
 	// Enable to publish sensor info
 	trafficOn = 1
