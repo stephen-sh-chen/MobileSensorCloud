@@ -193,9 +193,11 @@ func publishSensorInfo() {
 
 					j, _ := json.Marshal(signal)
 					go pubnub.Publish(my_channel, string(j), successChannel, errorChannel)
+
 					select {
 					case response := <-successChannel:
 						fmt.Println(string(response))
+						fmt.Println("Sent Message " + string(j))
 					case err := <-errorChannel:
 						fmt.Println(string(err))
 					case <-messaging.Timeout():
