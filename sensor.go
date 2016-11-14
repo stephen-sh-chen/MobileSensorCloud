@@ -276,7 +276,7 @@ func addSensorHandler(w http.ResponseWriter, r *http.Request) {
 		var sNew SensorProfile
 		sNew.ID, err = newUUID()
 		sNew.Name = sReq.SensorName
-		sNew.Type = sReq.SensorType
+		sNew.Type = sReq.SensorType // 1: noise sensor; 2: air sensor
 		sNew.State = 1
 		sNew.Value = 0
 		sNew.Unit = "db"
@@ -306,9 +306,9 @@ func main() {
 	mux.HandleFunc("/test/gmap", testGmap) // gmapExample.html
 
 	// Block of my sensor API
-	mux.HandleFunc("/api/addSensor", addSensorHandler)
-	mux.HandleFunc("/api/traffic/on", trafficOnHandler)
-	mux.HandleFunc("/api/traffic/off", trafficOffHandler)
+	mux.HandleFunc("/api/addSensor", addSensorHandler)    // POST method
+	mux.HandleFunc("/api/traffic/on", trafficOnHandler)   // all method
+	mux.HandleFunc("/api/traffic/off", trafficOffHandler) // all method
 
 	// Enable to publish sensor info
 	trafficOn = 1
