@@ -250,17 +250,59 @@ func subscribeSensorInfo() {
 	}()
 }
 
-func trafficOnHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Traffic ON = " + strconv.Itoa(trafficOn))
+func trafficAllONHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("All Traffic ON = " + strconv.Itoa(trafficOn))
 	trafficOn = 1
-	fmt.Println("Traffic ON = " + strconv.Itoa(trafficOn))
+	fmt.Println("All Traffic ON = " + strconv.Itoa(trafficOn))
 }
 
-func trafficOffHandler(w http.ResponseWriter, r *http.Request) {
+func trafficSensorONHandler(w http.ResponseWriter, r *http.Request) {
+	sensorID := r.URL.Query()["sensorid"][0]
+	if sensorID == "" {
+		var str string = "Please give a sensor ID"
+		http.Error(w, str, 400)
+		return
+	}
 
-	fmt.Println("Traffic ON = " + strconv.Itoa(trafficOn))
+	fmt.Println("Query Sensor ID = ", sensorID)
+	sensor, ok := sensorMap[sensorID]
+	if !ok {
+		var str string = "Not found Sensor ID: " + sensorID
+		http.Error(w, str, 400)
+		return
+	} else {
+		sensor.State = 1
+		sensorMap[sensorID] = sensor
+		fmt.Println("Sensor state is %d on now ID %s", sensorMap[sensorID], sensorID)
+	}
+}
+
+func trafficAllOFFHandler(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("All Traffic OFF = " + strconv.Itoa(trafficOn))
 	trafficOn = 0
-	fmt.Println("Traffic ON = " + strconv.Itoa(trafficOn))
+	fmt.Println("All Traffic OFF = " + strconv.Itoa(trafficOn))
+}
+
+func trafficSensorOFFHandler(w http.ResponseWriter, r *http.Request) {
+	sensorID := r.URL.Query()["sensorid"][0]
+	if sensorID == "" {
+		var str string = "Please give a sensor ID"
+		http.Error(w, str, 400)
+		return
+	}
+
+	fmt.Println("Query Sensor ID = ", sensorID)
+	sensor, ok := sensorMap[sensorID]
+	if !ok {
+		var str string = "Not found Sensor ID: " + sensorID
+		http.Error(w, str, 400)
+		return
+	} else {
+		sensor.State = 0
+		sensorMap[sensorID] = sensor
+		fmt.Println("Sensor state is %d on now ID %s", sensorMap[sensorID], sensorID)
+	}
 }
 
 func addSensorHandler(w http.ResponseWriter, r *http.Request) {
@@ -331,8 +373,10 @@ func main() {
 	// Block of my sensor API
 	mux.HandleFunc("/api/addSensor", addSensorHandler)             // POST method
 	mux.HandleFunc("/api/show-sensor-list", showSensorListHandler) // Get  method
-	mux.HandleFunc("/api/traffic/on", trafficOnHandler)            // Get  method
-	mux.HandleFunc("/api/traffic/off", trafficOffHandler)          // Get  method
+	mux.HandleFunc("/api/traffic/on/", trafficAllONHandler)        // Get  method
+	mux.HandleFunc("/api/traffic/on", trafficSensorONHandler)      // Get  method
+	mux.HandleFunc("/api/traffic/off/", trafficAllOFFHandler)      // Get  method
+	mux.HandleFunc("/api/traffic/off", trafficSensorOFFHandler)    // Get  method
 
 	// Enable to publish sensor info
 	trafficOn = 1
