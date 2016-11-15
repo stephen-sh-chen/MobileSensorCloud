@@ -274,6 +274,7 @@ func trafficSensorONHandler(w http.ResponseWriter, r *http.Request) {
 		sensor.State = 1
 		sensorMap[sensorID] = sensor
 		fmt.Println("Sensor state is %d on now ID %s", sensorMap[sensorID], sensorID)
+		json.NewEncoder(w).Encode(sensor)
 	}
 }
 
@@ -302,6 +303,28 @@ func trafficSensorOFFHandler(w http.ResponseWriter, r *http.Request) {
 		sensor.State = 0
 		sensorMap[sensorID] = sensor
 		fmt.Println("Sensor state is %d on now ID %s", sensorMap[sensorID], sensorID)
+		json.NewEncoder(w).Encode(sensor)
+	}
+}
+
+func deleteSensorHandler(w http.ResponseWriter, r *http.Request) {
+	sensorID := r.URL.Query()["sensorid"][0]
+	if sensorID == "" {
+		var str string = "Please give a sensor ID"
+		http.Error(w, str, 400)
+		return
+	}
+
+	fmt.Println("Query Sensor ID = ", sensorID)
+	_, ok := sensorMap[sensorID]
+	if !ok {
+		var str string = "Not found Sensor ID: " + sensorID
+		http.Error(w, str, 400)
+		return
+	} else {
+		delete(sensorMap, sensorID)
+		fmt.Println("Delete Sensor ID %s", sensorID)
+		json.NewEncoder(w).Encode(sensorMap)
 	}
 }
 
@@ -355,7 +378,6 @@ func showSensorListHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Please send a request body", 400)
 			return
 		}
-
 		json.NewEncoder(w).Encode(sensorMap)
 	}
 
@@ -371,12 +393,13 @@ func main() {
 	mux.HandleFunc("/test/gmap", testGmap) // gmapExample.html
 
 	// Block of my sensor API
-	mux.HandleFunc("/api/addSensor", addSensorHandler)             // POST method
+	mux.HandleFunc("/api/add-sensor", addSensorHandler)            // POST method
 	mux.HandleFunc("/api/show-sensor-list", showSensorListHandler) // Get  method
 	mux.HandleFunc("/api/traffic/on/", trafficAllONHandler)        // Get  method
 	mux.HandleFunc("/api/traffic/on", trafficSensorONHandler)      // Get  method
 	mux.HandleFunc("/api/traffic/off/", trafficAllOFFHandler)      // Get  method
 	mux.HandleFunc("/api/traffic/off", trafficSensorOFFHandler)    // Get  method
+	mux.HandleFunc("/api/delete-sensor", deleteSensorHandler)      // Get method
 
 	// Enable to publish sensor info
 	trafficOn = 1
