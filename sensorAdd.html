@@ -125,6 +125,9 @@
               <a ng-disabled="isDisabled" class="btn btn-primary" ng-click="AddSensor()">Add</a>
               <br>
               <br>
+              <a ng-disabled="isDisabled" class="btn btn-primary" ng-click="ShowSensor()">Show All Sensors</a>
+              <br>
+              <br>
               <a ng-disabled="isDisabled" class="btn btn-primary" ng-click="StartAllSensor()">Start All Sensors</a>
               <br>
               <br>
@@ -159,7 +162,7 @@
                 }
             }
 
-            $http.post('/api/addSensor', data, config)
+            $http.post('/api/add-sensor', data, config)
             .success(function (data, status, headers, config) {
                 $scope.PostDataResponse = data;
             })
@@ -180,7 +183,7 @@
                 params: parameters
             };
 
-            $http.get('/api/traffic/on', config)
+            $http.get('/api/traffic/on/', config)
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
             })
@@ -201,7 +204,7 @@
                 params: parameters
             };
 
-            $http.get('/api/traffic/off', config)
+            $http.get('/api/traffic/off/', config)
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
             })

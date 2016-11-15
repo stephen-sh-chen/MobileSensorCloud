@@ -66,7 +66,8 @@
         center: {lat: lat, lng : lng, alt: 0}
       });
 
-      map_marker = new google.maps.Marker({position: {lat: lat, lng: lng}, map: map});
+      var image = 'http://rti.vta.org/Images/MapIcons/Bus_0.png';
+      map_marker = new google.maps.Marker({position: {lat: lat, lng: lng}, map: map, icon: image});
       map_marker.setMap(map);
     }
 
@@ -103,8 +104,11 @@
         channel: "my_channel",
         message: function(message, channel) {
           console.log(message)
-          lat = message['Lat'];
-          lng = message['Long'];
+          obj = JSON.parse(message);
+          lat = obj.Lat;
+          lng = obj.Long;
+          console.log(lat)
+          console.log(lng)
           //custom method
           redraw();
         },
