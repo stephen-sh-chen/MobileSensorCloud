@@ -162,6 +162,7 @@ func signalHelper(sensor *SensorProfile, signal *SensorSignal) {
 
 	sensor.Long += float_rand(0.001, 0.005)
 	sensor.Lat += float_rand(0.001, 0.005)
+	sensorMap[sensor.ID] = *sensor
 	signal.Long = sensor.Long
 	signal.Lat = sensor.Lat
 }
@@ -410,7 +411,7 @@ func main() {
 
 	// Enable to publish sensor info
 	trafficOn = 1
-	subscribeSensorInfo()
+	//subscribeSensorInfo()
 	go publishSensorInfo()
 
 	// Start to port 3000 for REST service
