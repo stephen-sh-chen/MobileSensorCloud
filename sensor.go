@@ -40,18 +40,6 @@ func test(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func testGmap(w http.ResponseWriter, r *http.Request) {
-
-	var templates = template.Must(template.New("locateip").ParseFiles("gmapExample.html"))
-
-	err := templates.ExecuteTemplate(w, "gmapExample.html", nil)
-
-	if err != nil {
-		panic(err)
-	}
-
-}
-
 func returnLatLong(w http.ResponseWriter, r *http.Request) {
 
 	// not recommended to open the file each time per request
@@ -328,6 +316,25 @@ func deleteSensorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func showGmap(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("enter show google map")
+	sensorID := r.URL.Query()["sensorid"][0]
+	if sensorID == "" {
+		var str string = "Please give a sensor ID"
+		http.Error(w, str, 400)
+		return
+	}
+
+	var templates = template.Must(template.New("locateip").ParseFiles("gmapExample.html"))
+	p := SensorProfile{ID: sensorID}
+	err := templates.ExecuteTemplate(w, "gmapExample.html", p)
+
+	if err != nil {
+		panic(err)
+	}
+
+}
+
 func addSensorHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Enter addSensorHandler!")
 
@@ -387,12 +394,11 @@ func main() {
 
 	mux := mux.NewRouter()
 
-	mux.HandleFunc("/", home) // sensorAdd.html
 	mux.HandleFunc("/returncoord", returnLatLong)
-	mux.HandleFunc("/test", test)          // index.html
-	mux.HandleFunc("/test/gmap", testGmap) // gmapExample.html
+	mux.HandleFunc("/test", test) // index.html
 
 	// Block of my sensor API
+	mux.HandleFunc("/", home)                                      // sensorAdd.html
 	mux.HandleFunc("/api/add-sensor", addSensorHandler)            // POST method
 	mux.HandleFunc("/api/show-sensor-list", showSensorListHandler) // Get  method
 	mux.HandleFunc("/api/traffic/on/", trafficAllONHandler)        // Get  method
@@ -400,6 +406,7 @@ func main() {
 	mux.HandleFunc("/api/traffic/off/", trafficAllOFFHandler)      // Get  method
 	mux.HandleFunc("/api/traffic/off", trafficSensorOFFHandler)    // Get  method
 	mux.HandleFunc("/api/delete-sensor", deleteSensorHandler)      // Get method
+	mux.HandleFunc("/api/gmap", showGmap)                          // gmapExample.html
 
 	// Enable to publish sensor info
 	trafficOn = 1
