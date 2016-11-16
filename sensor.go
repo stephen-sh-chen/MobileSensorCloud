@@ -410,7 +410,7 @@ func main() {
 	mux.HandleFunc("/api/gmap", showGmap)                          // gmapExample.html
 
 	// Enable to publish sensor info
-	trafficOn = 1
+	trafficOn = 0
 	//subscribeSensorInfo()
 	go publishSensorInfo()
 
