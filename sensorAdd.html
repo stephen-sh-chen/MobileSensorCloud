@@ -317,10 +317,33 @@
             });
         };
 
+        
+        function DeleteFunction () {
+        	console.log("enter Delete key=: ");
+        }
+        // $('a').click(function(){ 
+        // 	DeleteFunction(); 
+        // 	return false; 
+        // });
+        
+
+        /*$(document).ready(function() {
+		    $('#DelSensor').click(function() {
+		    	console.log("enter Delete key=: ", key);
+			    $.ajax({
+			        url: "/api/delete-sensor?sensorid={0}",
+			        success: function(data){
+			          do_something_with(data);
+			        }
+			    })
+			//    return false;
+		});*/
+
+
 		// First, checks if it isn't implemented yet.
 		if (!String.prototype.format) {
 		  String.prototype.format = function() {
-		    var args = arguments;
+		    var args = arguments;d
 		    return this.replace(/{(\d+)}/g, function(match, number) { 
 		      return typeof args[number] != 'undefined'
 		        ? args[number]
@@ -343,11 +366,12 @@
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
                 $('#sensorTable tbody').remove();
+                count = 0;
                 $.each( data, function( key, value ) {
                 	var mapLink = "<a target=\"_blank\" ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/gmap?sensorid={0}\">map</a>".format(key);
 
-					var deleteLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" ng-click=\"DeleteSensor({0})\">DEL</a>".format(key);
-                	
+					var deleteLink = "<a id=\"DelSensor" + count + "\" href=\"#\">DEL</a>";
+
                 	var onLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/traffic/on?sensorid={0}\">ON</a>".format(key);
                 	var offLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/traffic/off?sensorid={0}\">OFF</a>".format(key);
                 	//var deleteLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/delete-sensor?sensorid={0}\">DEL</a>".format(key);
@@ -367,8 +391,15 @@
                 	TableRow += "<td>"+ deleteLink +"</td>";
                 	TableRow += "</tr>";
                 	$('#sensorTable').append(TableRow);
+
+                	
+			        $('#sensorTable').on("click", "#DelSensor" + count, function(){ 
+			        	DeleteFunction(); 
+			        	return false; 
+			        });
 				  console.log("key: ", mapLink);
 				  //console.log("value: ", value);
+				  count++;
 				});
             })
             .error(function (data, status, header, config) {
@@ -377,6 +408,10 @@
                 console.log("headers: ", headers);
                 console.log("config: ", config);
             });
+
+            //$route.reload()
+            //$window.location.reload();
+            //$route.reload();
         };
 
       });
