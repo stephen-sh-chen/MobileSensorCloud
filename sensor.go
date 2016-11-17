@@ -160,8 +160,8 @@ func signalHelper(sensor *SensorProfile, signal *SensorSignal) {
 		signal.Unit = "AQI"
 	}
 
-	sensor.Long += float_rand(0.001, 0.005)
-	sensor.Lat += float_rand(0.001, 0.005)
+	sensor.Long += float_rand(0.0001, 0.0002)
+	sensor.Lat += float_rand(0.0001, 0.0002)
 	sensorMap[sensor.ID] = *sensor
 	signal.Long = sensor.Long
 	signal.Lat = sensor.Lat

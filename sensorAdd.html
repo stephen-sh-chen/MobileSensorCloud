@@ -230,6 +230,7 @@
             $http.post('/api/add-sensor', data, config)
             .success(function (data, status, headers, config) {
                 $scope.PostDataResponse = data;
+                $scope.ShowAllSensor();
             })
             .error(function (data, status, header, config) {
                 console.log("data: ", data);
@@ -317,27 +318,18 @@
             });
         };
 
-        
-        function DeleteFunction () {
-        	console.log("enter Delete key=: ");
-        }
-        // $('a').click(function(){ 
-        // 	DeleteFunction(); 
-        // 	return false; 
-        // });
-        
-
-        /*$(document).ready(function() {
-		    $('#DelSensor').click(function() {
-		    	console.log("enter Delete key=: ", key);
-			    $.ajax({
-			        url: "/api/delete-sensor?sensorid={0}",
-			        success: function(data){
-			          do_something_with(data);
-			        }
-			    })
-			//    return false;
-		});*/
+        //
+        // GUID generator
+        //
+		function guid() {
+		  function s4() {
+		    return Math.floor((1 + Math.random()) * 0x10000)
+		      .toString(16)
+		      .substring(1);
+		  }
+		  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+		    s4() + '-' + s4() + s4() + s4();
+		}
 
 
 		// First, checks if it isn't implemented yet.
@@ -366,14 +358,17 @@
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
                 $('#sensorTable tbody').remove();
-                count = 0;
+
                 $.each( data, function( key, value ) {
+                	var uuid = guid()
                 	var mapLink = "<a target=\"_blank\" ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/gmap?sensorid={0}\">map</a>".format(key);
 
-					var deleteLink = "<a id=\"DelSensor" + count + "\" href=\"#\">DEL</a>";
+					var deleteLink = '<a id="DelSensor{0}" href="#" ng-disabled="isDisabled" class="btn btn-primary">DEL</a>'.format(uuid)
+					var onLink = '<a id="ONSensor{0}" href="#" ng-disabled="isDisabled" class="btn btn-primary">ON</a>'.format(uuid)
+					var offLink = '<a id="OFFSensor{0}" href="#" ng-disabled="isDisabled" class="btn btn-primary">OFF</a>'.format(uuid)
 
-                	var onLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/traffic/on?sensorid={0}\">ON</a>".format(key);
-                	var offLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/traffic/off?sensorid={0}\">OFF</a>".format(key);
+                	//var onLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/traffic/on?sensorid={0}\">ON</a>".format(key);
+                	//var offLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/traffic/off?sensorid={0}\">OFF</a>".format(key);
                 	//var deleteLink = "<a ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/delete-sensor?sensorid={0}\">DEL</a>".format(key);
 
                 	var TableRow = "<tr>"
@@ -381,7 +376,7 @@
                 	TableRow += "<td>"+ key +"</td>";
                 	TableRow += "<td>"+ value.SensorName +"</td>";
                 	TableRow += "<td>"+ value.Type +"</td>";
-                	TableRow += "<td>"+ value.State +"</td>";
+                	TableRow += '<td id="td{0}">'.format(uuid) + value.State +"</td>";
                 	TableRow += "<td>"+ value.Value +"</td>";
                 	TableRow += "<td>"+ value.Unit +"</td>";
                 	TableRow += "<td>"+ value.HostVehicleID +"</td>";
@@ -392,14 +387,46 @@
                 	TableRow += "</tr>";
                 	$('#sensorTable').append(TableRow);
 
-                	
-			        $('#sensorTable').on("click", "#DelSensor" + count, function(){ 
-			        	DeleteFunction(); 
+			        $('#sensorTable').on("click", "#DelSensor" + uuid, function(){ 
+						var td = $(this).parent();
+				        var tr = td.parent();
+						$http.get('/api/delete-sensor?sensorid={0}'.format(key), config)
+			            .success(function (data, status, headers, config) {
+			                $scope.Details = data;
+			                //change the background color to red before removing
+					        tr.css("background-color","#FF3700");
+					        tr.fadeOut(400, function(){
+					            tr.remove();
+					        });
+			            })
 			        	return false; 
 			        });
-				  console.log("key: ", mapLink);
-				  //console.log("value: ", value);
-				  count++;
+
+			        $('#sensorTable').on("click", "#ONSensor" + uuid, function(){ 
+						var td = $(this).parent();
+				        var tr = td.parent();
+						$http.get('/api/traffic/on?sensorid={0}'.format(key), config)
+			            .success(function (data, status, headers, config) {
+			                $scope.Details = data;
+			                $("#td{0}".format(uuid)).text("1"); // change the table content
+				        	tr.css("background-color","#7BFF00"); 
+			            })
+			        	return false; 
+			        });
+
+			        $('#sensorTable').on("click", "#OFFSensor" + uuid, function(){ 
+			        	var td = $(this).parent();
+			        	var tr = td.parent();
+						$http.get('/api/traffic/off?sensorid={0}'.format(key), config)
+			            .success(function (data, status, headers, config) {
+			                $scope.Details = data;
+			                $("#td{0}".format(uuid)).text("0"); // change the table content
+					        tr.css("background-color","#FFFFFF");
+			            })
+
+			        	return false; 
+			        });
+				  console.log("UUID: ", uuid);
 				});
             })
             .error(function (data, status, header, config) {
