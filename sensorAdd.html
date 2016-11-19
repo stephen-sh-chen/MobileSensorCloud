@@ -179,30 +179,7 @@
 	  </thead>
 
 	  <tbody>
-		  <tr>
-		  	<td><a target="_blank" ng-disabled="isDisabled" class="btn btn-primary" href="/api/gmap">map</a></td> 
-		    <td>Alfreds Futterkiste</td>
-		    <td>Maria Anders</td>
-		    <td>Germany</td>
-	  	  </tr>
-	  	  <tr>
-		  	<td><a target="_blank" ng-disabled="isDisabled" class="btn btn-primary" href="/api/gmap">map</a></td> 
-		    <td>Alfreds Futterkiste</td>
-		    <td>Maria Anders</td>
-		    <td>Germany</td>
-	  	  </tr>
-	  	  <tr>
-		  	<td><a target="_blank" ng-disabled="isDisabled" class="btn btn-primary" href="/api/gmap">map</a></td> 
-		    <td>Alfreds Futterkiste</td>
-		    <td>Maria Anders</td>
-		    <td>Germany</td>
-	  	  </tr>
-	  	  <tr>
-		  	<td><a target="_blank" ng-disabled="isDisabled" class="btn btn-primary" href="/api/gmap">map</a></td> 
-		    <td>Alfreds Futterkiste</td>
-		    <td>Maria Anders</td>
-		    <td>Germany</td>
-	  	  </tr>
+
 	  </tbody>
 	</table>
 	</div>
@@ -227,7 +204,7 @@
                 }
             }
 
-            $http.post('/api/add-sensor', data, config)
+            $http.post('/sensor-provider/api/add-sensor', data, config)
             .success(function (data, status, headers, config) {
                 $scope.PostDataResponse = data;
                 $scope.ShowAllSensor();
@@ -249,7 +226,7 @@
                 params: parameters
             };
 
-            $http.get('/api/traffic/on/', config)
+            $http.get('/sensor-provider/api/traffic/on/', config)
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
             })
@@ -270,7 +247,7 @@
                 params: parameters
             };
 
-            $http.get('/api/traffic/off/', config)
+            $http.get('/sensor-provider/api/traffic/off/', config)
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
             })
@@ -304,7 +281,7 @@
                 params: parameters
             };
 
-            var path = "/api/delete-sensor?sensorid={0}".format(key);
+            var path = "/sensor-provider/api/delete-sensor?sensorid={0}".format(key);
             $http.get(path, config)
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
@@ -354,14 +331,14 @@
                 params: parameters
             };
 
-            $http.get('/api/show-sensor-list', config)
+            $http.get('/sensor-provider/api/show-sensor-list', config)
             .success(function (data, status, headers, config) {
                 $scope.Details = data;
                 $('#sensorTable tbody').remove();
 
                 $.each( data, function( key, value ) {
                 	var uuid = guid()
-                	var mapLink = "<a target=\"_blank\" ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/api/gmap?sensorid={0}\">map</a>".format(key);
+                	var mapLink = "<a target=\"_blank\" ng-disabled=\"isDisabled\" class=\"btn btn-primary\" href=\"/sensor-provider/api/gmap?sensorid={0}\">map</a>".format(key);
 
 					var deleteLink = '<a id="DelSensor{0}" href="#" ng-disabled="isDisabled" class="btn btn-primary">DEL</a>'.format(uuid)
 					var onLink = '<a id="ONSensor{0}" href="#" ng-disabled="isDisabled" class="btn btn-primary">ON</a>'.format(uuid)
@@ -390,7 +367,7 @@
 			        $('#sensorTable').on("click", "#DelSensor" + uuid, function(){ 
 						var td = $(this).parent();
 				        var tr = td.parent();
-						$http.get('/api/delete-sensor?sensorid={0}'.format(key), config)
+						$http.get('/sensor-provider/api/delete-sensor?sensorid={0}'.format(key), config)
 			            .success(function (data, status, headers, config) {
 			                $scope.Details = data;
 			                //change the background color to red before removing
@@ -405,7 +382,7 @@
 			        $('#sensorTable').on("click", "#ONSensor" + uuid, function(){ 
 						var td = $(this).parent();
 				        var tr = td.parent();
-						$http.get('/api/traffic/on?sensorid={0}'.format(key), config)
+						$http.get('/sensor-provider/api/traffic/on?sensorid={0}'.format(key), config)
 			            .success(function (data, status, headers, config) {
 			                $scope.Details = data;
 			                $("#td{0}".format(uuid)).text("1"); // change the table content
@@ -417,7 +394,7 @@
 			        $('#sensorTable').on("click", "#OFFSensor" + uuid, function(){ 
 			        	var td = $(this).parent();
 			        	var tr = td.parent();
-						$http.get('/api/traffic/off?sensorid={0}'.format(key), config)
+						$http.get('/sensor-provider/api/traffic/off?sensorid={0}'.format(key), config)
 			            .success(function (data, status, headers, config) {
 			                $scope.Details = data;
 			                $("#td{0}".format(uuid)).text("0"); // change the table content

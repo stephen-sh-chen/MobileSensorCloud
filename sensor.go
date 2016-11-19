@@ -399,15 +399,15 @@ func main() {
 	mux.HandleFunc("/test", test) // index.html
 
 	// Block of my sensor API
-	mux.HandleFunc("/", home)                                      // sensorAdd.html
-	mux.HandleFunc("/api/add-sensor", addSensorHandler)            // POST method
-	mux.HandleFunc("/api/show-sensor-list", showSensorListHandler) // Get  method
-	mux.HandleFunc("/api/traffic/on/", trafficAllONHandler)        // Get  method
-	mux.HandleFunc("/api/traffic/on", trafficSensorONHandler)      // Get  method
-	mux.HandleFunc("/api/traffic/off/", trafficAllOFFHandler)      // Get  method
-	mux.HandleFunc("/api/traffic/off", trafficSensorOFFHandler)    // Get  method
-	mux.HandleFunc("/api/delete-sensor", deleteSensorHandler)      // Get method
-	mux.HandleFunc("/api/gmap", showGmap)                          // gmapExample.html
+	mux.HandleFunc("/sensor-provider/", home)                                      // sensorAdd.html
+	mux.HandleFunc("/sensor-provider/api/add-sensor", addSensorHandler)            // POST method
+	mux.HandleFunc("/sensor-provider/api/show-sensor-list", showSensorListHandler) // Get  method
+	mux.HandleFunc("/sensor-provider/api/traffic/on/", trafficAllONHandler)        // Get  method
+	mux.HandleFunc("/sensor-provider/api/traffic/on", trafficSensorONHandler)      // Get  method
+	mux.HandleFunc("/sensor-provider/api/traffic/off/", trafficAllOFFHandler)      // Get  method
+	mux.HandleFunc("/sensor-provider/api/traffic/off", trafficSensorOFFHandler)    // Get  method
+	mux.HandleFunc("/sensor-provider/api/delete-sensor", deleteSensorHandler)      // Get method
+	mux.HandleFunc("/sensor-provider/api/gmap", showGmap)                          // gmapExample.html
 
 	// Enable to publish sensor info
 	trafficOn = 0
