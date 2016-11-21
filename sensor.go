@@ -160,8 +160,8 @@ func signalHelper(sensor *SensorProfile, signal *SensorSignal) {
 		signal.Unit = "AQI"
 	}
 
-	sensor.Long += float_rand(0.0001, 0.0002)
-	sensor.Lat += float_rand(0.0001, 0.0002)
+	sensor.Long += float_rand(0.001, 0.002)
+	sensor.Lat += float_rand(0.001, 0.002)
 	sensorMap[sensor.ID] = *sensor
 	signal.Long = sensor.Long
 	signal.Lat = sensor.Lat
@@ -357,7 +357,11 @@ func addSensorHandler(w http.ResponseWriter, r *http.Request) {
 		sNew.Type = sReq.SensorType // 1: noise sensor; 2: air sensor
 		sNew.State = 1
 		sNew.Value = 0
-		sNew.Unit = "db"
+		if sReq.SensorType == 1 {
+			sNew.Unit = "db"
+		} else if sReq.SensorType == 2 {
+			sNew.Unit = "AQI"
+		}
 		sNew.HostVehicleID = sReq.HostVehicleID
 		sNew.Group = 0
 		sNew.Long = -121.87558059999999

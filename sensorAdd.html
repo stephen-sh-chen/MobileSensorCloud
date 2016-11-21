@@ -2,7 +2,7 @@
 <html class="no-js">
   <head>
     <meta charset="utf-8">
-    <title>Broadcast Example</title>
+    <title>Mobile Sensor Cloud - Sensor Provider</title>
     <meta name="description" content="">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
@@ -32,7 +32,7 @@
   <body ng-app="broadcastApp">
     <div ng-controller="BcCtrl">
       <div class="container">
-        <h1>Sensor Provider - Add Page</h1>
+        <h1>Physical Sensor Provider - Management Page</h1>
         <form class="form-horizontal">
           <legend></legend>
           <div class="form-group">
@@ -57,7 +57,7 @@
             <!-- Delay -->
             <label class="col-sm-2 control-label">Add to Bus</label>
             <div class="col-sm-2">
-              <select class="form-control" name="DropDownBusOption" id="DropDownBusOption" title="Select a Bus Route" style="width:350px;">
+              <select class="form-control" name="DropDownBusOption" id="DropDownBusOption" title="Select a Bus Route" style="width:500px;">
                     <option value="0">--- Select A Bus Route ---</option>
                     <option value="10036">10 - SANTA CLARA TRANSIT- METRO AIR, West</option>
                     <option value="10033">10 - SANTA CLARA TRANSIT- METRO AIR, East</option>
@@ -153,9 +153,6 @@
           </div>
           </div>
         </form>
-        <div class="container">
-          <a href="/test/gmap">Google Maps Example</a>
-        </div>
       </div>
     </div>
     
@@ -170,7 +167,7 @@
 		    <th>Sensor Status</th>
 		    <th>Sensor Value</th>
 		    <th>Sensor Unit</th>
-		    <th>Attached to</th>
+		    <th>Attached to Bus Number</th>
 		    <th>Group ID</th>
 		    <th>On</th>
 		    <th>Off</th>
