@@ -89,13 +89,13 @@ type SensorProfile struct {
 }
 
 type SensorSignal struct {
-	SignalID  string
-	SensorID  string
-	TimeStamp string
-	Value     float64
-	Unit      string
-	Long      float64
-	Lat       float64
+	SignalID  string  `json:"signal_id"`
+	SensorID  string  `json:"sensor_id"`
+	TimeStamp string  `json:"last_update"`
+	Value     float64 `json:"value"`
+	Unit      string  `json:"unit"`
+	Long      float64 `json:"longitude"`
+	Lat       float64 `json:"latitude"`
 }
 
 type AddSensorReq struct {
