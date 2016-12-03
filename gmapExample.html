@@ -105,10 +105,10 @@
         message: function(message, channel) {
           console.log(message)
           obj = JSON.parse(message);
-          if (obj.SensorID == {{.ID}}) {
-            lat = obj.Lat;
-            lng = obj.Long;
-            console.log(obj.SensorID)
+          if (obj.sensor_id == {{.ID}}) {
+            lat = obj.latitude;
+            lng = obj.longitude;
+            console.log(obj.sensor_id)
             console.log(lat)
             console.log(lng)
             //custom method
@@ -117,7 +117,7 @@
         },
 
         state: {
-          SensorID:"cd85876-4045-43ea-ada5-f68e1137890f"
+          sensor_id:"cd85876-4045-43ea-ada5-f68e1137890f"
         },      
         
         connect: function() {console.log("PubNub Connected")}
