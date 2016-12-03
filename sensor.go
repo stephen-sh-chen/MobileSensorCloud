@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/oschwald/geoip2-golang"
 	"github.com/pubnub/go/messaging"
+	"gopkg.in/mgo.v2"
 	"html/template"
 	"io"
 	"math/rand"
@@ -88,6 +89,20 @@ type SensorProfile struct {
 	Lat           float64
 }
 
+/*
+type SensorProfile struct {
+	ID            string  `json:"sensor_id"`
+	Name          string  `json:"sensor_name"`
+	Type          int     `json:"sensor_type"`
+	State         int     `json:"sensor_status"`
+	Value         float64 `json:"sensor_name"`
+	Unit          string  `json:"sensor_unit"`
+	HostVehicleID string  `json:"sensor_host_vehicle_id"`
+	Group         int     `json:"sensor_group"`
+	Long          float64 `json:"sensor_longitude"`
+	Lat           float64 `json:"sensor_latitude"`
+}*/
+
 type SensorSignal struct {
 	SignalID  string  `json:"signal_id"`
 	SensorID  string  `json:"sensor_id"`
@@ -118,6 +133,7 @@ var trafficOn int = 0
 var my_pubkey = "pub-c-bcc7ac96-ccbe-4577-bd6f-66321585d73a"
 var my_subkey = "sub-c-6d08ffd2-a589-11e6-80e1-0619f8945a4f"
 var my_channel = "my_channel"
+var db_addr = "54.191.90.246:27017"
 
 // newUUID generates a random UUID according to RFC 4122
 func newUUID() (string, error) {
@@ -336,6 +352,33 @@ func showGmap(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func addSensor2DB(sensor SensorProfile) {
+	session, err := mgo.Dial(db_addr)
+	if err != nil {
+		panic(err)
+		fmt.Println("cannot connet to the mongo DB!!!!")
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	fmt.Println("ready to add sensor to DB!")
+
+	/*var s SensorProfile
+	j, _ := json.Marshal(sensor)
+	err = json.Unmarshal([]byte(j), &s)
+	if err != nil {
+		fmt.Println("json decode fail!!!")
+		return
+	}*/
+
+	c := session.DB("fullstack").C("sensor")
+	err = c.Insert(sensor)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Added a new sensor %s to DB", sensor.ID)
+}
+
 func addSensorHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Enter addSensorHandler!")
 
@@ -370,6 +413,7 @@ func addSensorHandler(w http.ResponseWriter, r *http.Request) {
 		//fmt.Println("Sesnot ID = " + sNew.ID)
 
 		sensorMap[sNew.ID] = sNew // add sensor in the management map
+		addSensor2DB(sNew)
 
 		var sRes AddSensorRes
 		sRes.SensorID = sensorMap[sNew.ID].ID
