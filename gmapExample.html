@@ -20,7 +20,7 @@
 
   </head>
   <body>
-    <div class="container"><h1>Sensor Location</h1></div>
+    <div class="container"><h1>Location of Sensor ID: {{.ID}}</h1></div>
     <div id="map-canvas"></div>
     
     <!-- Map Configuration and data -->
@@ -68,7 +68,7 @@
     function initialize() {
       console.log("Google Maps Initialized")
       map = new google.maps.Map(document.getElementById('map-canvas'), {
-        zoom: 20,
+        zoom: 15,
         center: {lat: lat, lng : lng, alt: 0}
       });
 
