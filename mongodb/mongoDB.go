@@ -41,6 +41,8 @@ func addSensorSignal2DB(s *mgo.Session, msg interface{}) {
 		fmt.Println(err)
 		return
 	}
+
+	fmt.Println("Insert Signal to Mongo DB!")
 }
 
 func subscribeSensorInfo(s *mgo.Session) {
