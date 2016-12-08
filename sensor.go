@@ -147,6 +147,7 @@ var my_channel = "my_channel"
 var db_addr = "54.191.90.246:27017"
 var xy []Coordinate
 var xy_index = 0
+var xy_direction = 1
 
 // newUUID generates a random UUID according to RFC 4122
 func newUUID() (string, error) {
@@ -191,12 +192,15 @@ func signalHelper(sensor *SensorProfile, signal *SensorSignal) {
 
 	//sensor.Long += float_rand(0.001, 0.002)
 	//sensor.Lat += float_rand(0.001, 0.002)
-	if xy_index == len(xy) {
-		xy_index = 0
+	if xy_index == len(xy)-1 {
+		xy_direction = -1
+	} else if xy_index == 0 {
+		xy_direction = 1
 	}
+	xy_index += xy_direction
+
 	sensor.Long = xy[xy_index].longitude
 	sensor.Lat = xy[xy_index].latitude
-	xy_index++
 	sensorMap[sensor.ID] = *sensor
 	signal.Long = sensor.Long
 	signal.Lat = sensor.Lat
@@ -211,7 +215,7 @@ func publishSensorInfo() {
 	for {
 		if trafficOn > 0 {
 			for _, sensor := range sensorMap {
-				time.Sleep(1000 * time.Millisecond)
+				time.Sleep(100 * time.Millisecond)
 				//j, _ := json.Marshal(value)
 				//fmt.Println(string(j))
 				if sensor.State == 1 {
