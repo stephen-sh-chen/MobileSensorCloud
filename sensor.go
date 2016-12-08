@@ -215,7 +215,7 @@ func publishSensorInfo() {
 	for {
 		if trafficOn > 0 {
 			for _, sensor := range sensorMap {
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(1000 * time.Millisecond)
 				//j, _ := json.Marshal(value)
 				//fmt.Println(string(j))
 				if sensor.State == 1 {
