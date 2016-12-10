@@ -306,7 +306,7 @@ func trafficSensorONHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		sensor.State = 1
 		sensorMap[sensorID] = sensor
-		fmt.Println("Sensor state is %d on now ID %s", sensorMap[sensorID], sensorID)
+		fmt.Printf("Sensor state is %d on now ID %s \n", sensorMap[sensorID].State, sensorID)
 		json.NewEncoder(w).Encode(sensor)
 	}
 }
@@ -335,7 +335,7 @@ func trafficSensorOFFHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		sensor.State = 0
 		sensorMap[sensorID] = sensor
-		fmt.Println("Sensor state is %d on now ID %s", sensorMap[sensorID], sensorID)
+		fmt.Printf("Sensor state is %d on now ID %s \n", sensorMap[sensorID].State, sensorID)
 		json.NewEncoder(w).Encode(sensor)
 	}
 }
@@ -356,7 +356,7 @@ func deleteSensorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		delete(sensorMap, sensorID)
-		fmt.Println("Delete Sensor ID %s", sensorID)
+		fmt.Printf("Delete Sensor ID %s \n", sensorID)
 		json.NewEncoder(w).Encode(sensorMap)
 	}
 }
@@ -404,7 +404,7 @@ func addSensor2DB(sensor SensorProfile) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Added a new sensor %s to DB", sensor.ID)
+	fmt.Printf("Added a new sensor %s to DB \n", sensor.ID)
 }
 
 func addSensorHandler(w http.ResponseWriter, r *http.Request) {
